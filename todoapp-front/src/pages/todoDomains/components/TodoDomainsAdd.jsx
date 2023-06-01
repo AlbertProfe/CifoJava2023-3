@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Container,
   Card,
   Checkbox,
   Button,
@@ -8,6 +7,7 @@ import {
   Divider,
   Icon,
 } from "semantic-ui-react";
+import { v4 as uuidv4 } from "uuid";
 
 // CRUD: create
 const TodoDomainsAdd = ({ onCreate }) => {
@@ -17,11 +17,11 @@ const TodoDomainsAdd = ({ onCreate }) => {
 
   const handleSubmit = () => {
     onCreate({
+      id: uuidv4(),
       text: text,
       author: author,
       due: due,
       completed: false,
-      color: "yellow",
     });
   };
 

@@ -21,7 +21,8 @@ const TodoService = {
 
   createTodo: async (todo) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/todo`, todo);
+      const response = await axios.post(`${API_BASE_URL}/todo/createTodo`, todo);
+      console.error("Data:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error creating todo:", error);
@@ -31,7 +32,7 @@ const TodoService = {
 
   updateTodo: async (todo) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/todo/${todo.id}`, todo);
+      const response = await axios.put(`${API_BASE_URL}/todo/updateTodo/${todo.id}`, todo);
       return response.data;
     } catch (error) {
       console.error("Error updating todo:", error);
@@ -41,7 +42,7 @@ const TodoService = {
 
   deleteTodo: async (todoId) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/todo/${todoId}`);
+      const response = await axios.delete(`${API_BASE_URL}/todo?id=${todoId}`);
       return response.data;
     } catch (error) {
       console.error("Error deleting todo:", error);
