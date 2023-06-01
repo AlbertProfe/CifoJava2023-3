@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/todo")
 public class TodoRestController {
     //here we are creating our end-point rest API
@@ -35,7 +36,6 @@ public class TodoRestController {
     }*/
 
     //CRUD: read
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping
     public ResponseEntity<Iterable<Todo>> getAllTodos() {
         //
@@ -47,35 +47,19 @@ public class TodoRestController {
         return ResponseEntity.accepted().headers(headers).body(todoRepository.findAll());
     }
 
-    //CRUD: read, find one book by id
-    @GetMapping("getTodo")
-    public ResponseEntity<Todo> findBookById(@RequestParam("id") String id) {
-        //
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("operation", "findTodoById");
-        headers.add("version", "api 1.0");
 
-        Optional<Todo> todoFound = todoRepository.findTodoById(id);
-        if (todoFound.isPresent()) {
-            headers.add("statusOperation", "success");
-            return ResponseEntity.accepted().headers(headers).body(todoFound.get());
-        } else {
-            headers.add("statusOperation", "not found");
-            return ResponseEntity.accepted().body(null);
-        }
-    }
 
     //CRUD: create
     @PostMapping(path = "createTodo", consumes = "application/JSON")
     public ResponseEntity<Todo> addTodo(@RequestBody Todo todo) {
         //
         HttpHeaders headers = new HttpHeaders();
-        headers.add("operation", "createBook");
+        headers.add("operation", "createTodo");
         headers.add("version", "api 1.0");
         headers.add("statusOperation", "success");
 
         Todo todoCreated = todoRepository.save(todo);
-
+        System.out.println("todo:" + todo);
         if (todoCreated != null) {
             headers.add("statusOperation", "success");
             return ResponseEntity.accepted().headers(headers).body(todoCreated);
@@ -86,29 +70,51 @@ public class TodoRestController {
     }
 
     //CRUD: delete
-    @DeleteMapping("deleteTodo")
-    public ResponseEntity<Todo> deleteBook(@RequestParam String id) {
+
+    @DeleteMapping
+    public ResponseEntity<Todo> deleteTodo(@RequestParam String id) {
         //
         HttpHeaders headers = new HttpHeaders();
         headers.add("operation", "deleteBook");
         headers.add("version", "api 1.0");
 
-        Optional<Todo> bookFound = todoRepository.findTodoById(id);
-        boolean isBook = bookFound.isPresent();
-        if (isBook) {
+        Optional<Todo> todoFound = todoRepository.findTodoById(id);
+        boolean isTodo = todoFound.isPresent();
+        if (isTodo) {
             //Optional<Book> deletedBook = bookservice.deleteBookById(id);
             todoRepository.deleteTodoById(id);
             headers.add("operationStatus", "deleted");
-            return ResponseEntity.accepted().headers(headers).body(bookFound.get());
+            return ResponseEntity.accepted().headers(headers).body(todoFound.get());
         } else {
             headers.add("operationStatus", "not found");
             return ResponseEntity.accepted().body(null);
         }
     }
+    @PutMapping("/updateTodo/{id}")
+    public ResponseEntity<Todo> updateTodo(@PathVariable String id, @RequestBody Todo dataTodo) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("operation", "completeTodo");
+        headers.add("version", "api 1.0");
+
+        Optional<Todo> todoFound = todoRepository.findTodoById(id);
 
 
+        if (todoFound.isPresent()){
+            //System.out.println(todoFound.get() + " -- " +  dataTodo);
+            todoRepository.save(dataTodo);
+            headers.add("operationStatus","updated");
+            return  ResponseEntity.accepted().headers(headers).body(todoFound.get());
+        } else {
+            headers.add("operationStatus","not found");
+            return ResponseEntity.accepted().headers(headers).body(null);}
+
+
+    }
+
+    /*
     //CRUD: update
-    /*@PutMapping("/updateTodo/{id}")
+    @PutMapping("/updateTodo/{id}")
     public ResponseEntity<Todo> updateTodo(@PathVariable String id, @RequestBody Todo dataTodo) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -142,5 +148,23 @@ public class TodoRestController {
 
         return null;
 
+    }
+
+    //CRUD: read, find one book by id
+    @GetMapping("getTodo")
+    public ResponseEntity<Todo> findBookById(@RequestParam("id") String id) {
+        //
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("operation", "findTodoById");
+        headers.add("version", "api 1.0");
+
+        Optional<Todo> todoFound = todoRepository.findTodoById(id);
+        if (todoFound.isPresent()) {
+            headers.add("statusOperation", "success");
+            return ResponseEntity.accepted().headers(headers).body(todoFound.get());
+        } else {
+            headers.add("statusOperation", "not found");
+            return ResponseEntity.accepted().body(null);
+        }
     }
 }
